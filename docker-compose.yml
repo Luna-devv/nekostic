@@ -1,0 +1,8 @@
+version: '3'
+services:
+  nekostic:
+    container_name: nekostic
+    image: nekostic
+    ports:
+      - "7004:7004"
+    restart: unless-stopped

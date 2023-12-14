@@ -37,7 +37,7 @@ func Get() Config {
 			Password: getEnv("REDIS_PW"),
 			Addr:     getEnv("REDIS_ADDR"),
 			Username: getEnv("REDIS_USR"),
-			Db:       db - 1,
+			Db:       db,
 		},
 		Port: getEnv("PORT"),
 	}

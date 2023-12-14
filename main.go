@@ -14,11 +14,6 @@ import (
 func main() {
 	conf := config.Get()
 
-	// if runtime.GOOS == "windows" {
-	// 	aggregate.Run()
-	// 	return
-	// }
-
 	fmt.Println("Starting cron job...")
 
 	scheduler := gocron.NewScheduler(time.UTC)

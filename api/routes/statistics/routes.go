@@ -3,10 +3,8 @@ package statistics
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/labstack/echo"
 )
@@ -19,27 +17,27 @@ type AggregatedEvent struct {
 	Snapshot string `json:"snapshot"`
 }
 
-var httpClient = http.Client{Timeout: time.Second * 2}
+// var httpClient = http.Client{Timeout: time.Second * 2}
 
 func (i route) Statistics(c echo.Context) error {
 
-	req, err := http.NewRequest(http.MethodGet, "http://10.0.0.50:7001/v1/users/@me", nil)
-	if err != nil {
-		fmt.Println("Api Error:", err)
-		return err
-	}
+	// req, err := http.NewRequest(http.MethodGet, "http://10.0.0.50:7001/v1/users/@me", nil)
+	// if err != nil {
+	// 	fmt.Println("Api Error:", err)
+	// 	return err
+	// }
 
-	req.Header.Set("Authorization", c.Request().Header.Get("authorization"))
+	// req.Header.Set("Authorization", c.Request().Header.Get("authorization"))
 
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		fmt.Println("Api Error:", err)
-		return err
-	}
+	// resp, err := httpClient.Do(req)
+	// if err != nil {
+	// 	fmt.Println("Api Error:", err)
+	// 	return err
+	// }
 
-	if resp.StatusCode != 200 {
-		return c.NoContent(resp.StatusCode)
-	}
+	// if resp.StatusCode != 200 {
+	// 	return c.NoContent(resp.StatusCode)
+	// }
 
 	ctx := context.Background()
 	keys, err := i.Client.Keys(ctx, "aggregated-command:*").Result()

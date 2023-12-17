@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"time"
 
-	"github.com/Luna-devv/nekostic/config"
+	"github.com/Luna-devv/nekostic/utils"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -16,30 +15,21 @@ type CommandEvent struct {
 	UserId string `json:"userId"`
 }
 
-type AggregatedEvent struct {
+type AggregatedCommandEvent struct {
 	Event string `json:"event"`
 	Name  string `json:"name"`
 	Uses  int    `json:"uses"`
 	Users int    `json:"users"`
 }
 
-func Run() {
-	start := makeTimestamp()
-
-	conf := config.Get()
+func Commands(client *redis.Client) {
+	start := utils.MakeTimestamp()
 	ctx := context.Background()
-
-	client := redis.NewClient(&redis.Options{
-		Addr:     conf.Redis.Addr,
-		Password: conf.Redis.Password,
-		Username: conf.Redis.Username,
-		DB:       conf.Redis.Db,
-	})
 
 	var commandEvents []CommandEvent
 
 	nameMap := make(map[string]map[string]bool)
-	aggregatedEvents := make(map[string]*AggregatedEvent)
+	aggregatedEvents := make(map[string]*AggregatedCommandEvent)
 
 	keys, err := client.Keys(ctx, "command-event:*").Result()
 
@@ -85,7 +75,7 @@ func Run() {
 		uid := ce.Event + "-" + ce.Name
 
 		if _, ok := aggregatedEvents[uid]; !ok {
-			aggregatedEvents[uid] = &AggregatedEvent{
+			aggregatedEvents[uid] = &AggregatedCommandEvent{
 				Event: ce.Event,
 				Name:  ce.Name,
 			}
@@ -102,7 +92,7 @@ func Run() {
 	for _, ae := range aggregatedEvents {
 		uid := ae.Event + "-" + ae.Name
 
-		err := client.HSet(ctx, "aggregated-command:"+make6DigitDay()+":"+uid, "event", ae.Event, "name", ae.Name, "uses", strconv.Itoa(ae.Uses), "users", strconv.Itoa(ae.Users)).Err()
+		err := client.HSet(ctx, "aggregated-command:"+utils.Make6DigitDay()+":"+uid, "event", ae.Event, "name", ae.Name, "uses", strconv.Itoa(ae.Uses), "users", strconv.Itoa(ae.Users)).Err()
 		if err != nil {
 			fmt.Println("Error storing struct in Redis hash:", err)
 			continue
@@ -110,16 +100,5 @@ func Run() {
 
 	}
 
-	client.Close()
-	fmt.Printf("Cron job ran: %s with %d events in %d ms\n", make6DigitDay(), len(aggregatedEvents), makeTimestamp()-start)
-}
-
-func make6DigitDay() string {
-	now := time.Now()
-
-	return fmt.Sprintf("%02d", int64(now.Day())) + strconv.FormatInt(int64(now.Month()), 10) + strconv.FormatInt(int64(now.Year()), 10)
-}
-
-func makeTimestamp() int64 {
-	return time.Now().UnixNano() / 1e6
+	fmt.Printf("Command cron ran: %s with %d events in %d ms\n", utils.Make6DigitDay(), len(aggregatedEvents), utils.MakeTimestamp()-start)
 }

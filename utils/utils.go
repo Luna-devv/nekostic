@@ -2,14 +2,13 @@ package utils
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 )
 
 func Make6DigitDay() string {
 	now := time.Now()
 
-	return fmt.Sprintf("%02d", int64(now.Day())) + strconv.FormatInt(int64(now.Month()), 10) + strconv.FormatInt(int64(now.Year()), 10)
+	return fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", now.Month()) + fmt.Sprintf("%04d", now.Year())
 }
 
 func MakeTimestamp() int64 {

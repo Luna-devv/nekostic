@@ -17,7 +17,7 @@ func New(conf config.Config) {
 	api := e.Group("")
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		Skipper:          middleware.DefaultSkipper,
-		AllowOrigins:     []string{"*"},
+		AllowOrigins:     []string{"wamellow.com,local.wamellow.com"},
 		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodOptions},
 		AllowCredentials: true,
 	}))
